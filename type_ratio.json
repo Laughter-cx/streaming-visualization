@@ -1,0 +1,14 @@
+[
+  {
+    "platform": "Amazon Prime",
+    "Action": 0.091,
+    "Horror": 0.048
+  },
+  {
+    "platform": "Netflix",
+    "Comedies": 0.087,
+    "Documentaries": 0.045,
+    "Dramas": 0.126,
+    "Thrillers": 0.03
+  }
+]
