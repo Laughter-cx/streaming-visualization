@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流媒体争霸：Netflix vs Disney+ vs 其他</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>筛选控件</h2>
+
+            <div class="filter-section">
+                <h3>平台筛选</h3>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform1">
+                        <label for="platform1">Netflix</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform2">
+                        <label for="platform2">Disney+</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform3">
+                        <label for="platform3">Amazon Prime</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform4">
+                        <label for="platform4">其他平台</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>年份范围</h3>
+                <div class="filter-control">
+                    <label>起始年份</label>
+                    <select>
+                        <option>2015</option>
+                        <option>2016</option>
+                        <option>2017</option>
+                        <option>2018</option>
+                        <option>2019</option>
+                        <option>2020</option>
+                        <option>2021</option>
+                        <option>2022</option>
+                        <option>2023</option>
+                        <option>2024</option>
+                    </select>
+                </div>
+                <div class="filter-control">
+                    <label>结束年份</label>
+                    <select>
+                        <option>2015</option>
+                        <option>2016</option>
+                        <option>2017</option>
+                        <option>2018</option>
+                        <option>2019</option>
+                        <option>2020</option>
+                        <option>2021</option>
+                        <option>2022</option>
+                        <option>2023</option>
+                        <option selected>2024</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>类型筛选</h3>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="type1">
+                        <label for="type1">电影</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="type2">
+                        <label for="type2">电视剧</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="type3">
+                        <label for="type3">纪录片</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="type4">
+                        <label for="type4">动画</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="type5">
+                        <label for="type5">综艺</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>地区筛选</h3>
+                <div class="filter-control">
+                    <select>
+                        <option value="">全部地区</option>
+                        <option value="na">北美</option>
+                        <option value="eu">欧洲</option>
+                        <option value="asia">亚洲</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="documentation">
+                <h3>说明文档</h3>
+                <p>本平台提供流媒体平台的可视化分析功能。</p>
+                <p>通过左侧筛选控件可以选择不同的数据维度，右侧展示四种不同类型的图表。</p>
+                <p>图表包括堆叠柱状图、平行坐标图、世界地图和雷达图。</p>
+                <button class="doc-button">查看详细说明文档</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>图一：堆叠柱状图</h3>
+                    <div class="chart-placeholder">图表区域</div>
+                </div>
+                <div class="chart-container">
+                    <h3>图二：平行坐标图</h3>
+                    <div class="chart-placeholder">图表区域</div>
+                </div>
+                <div class="chart-container">
+                    <h3>图三：空白世界地图</h3>
+                    <div class="chart-placeholder">图表区域</div>
+                </div>
+                <div class="chart-container">
+                    <h3>图四：雷达图</h3>
+                    <div class="chart-placeholder">图表区域</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
