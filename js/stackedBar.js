@@ -114,7 +114,7 @@
     var sels = filters.selectedItems || [];
     if (sels.length === 0) return 1;
     var hit = sels.some(function (sb) {
-      return sb.category === cat && sb.series === seriesKey;
+      return sb.category === cat && (sb.series === seriesKey || sb.series === "country");
     });
     return hit ? 1 : 0.3;
   }

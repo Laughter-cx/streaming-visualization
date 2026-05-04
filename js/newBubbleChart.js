@@ -3,6 +3,11 @@
   var CONTAINER_ID = "new-bubble-chart-container";
   var mapInstance = null;
   var mapLayerGroup = null;
+  var brushOverlay = null;
+  var brushState = null;
+  var brushEventsBound = false;
+  var currentBubbleRows = [];
+  var MIN_BRUSH_DISTANCE = 5;
 
   var PLATFORM_COLORS = {
     Netflix: "#e50914",
@@ -144,6 +149,186 @@
     return bestRating;
   }
 
+  function selectedCountrySet(filters) {
+    var selected = new Set();
+    ((filters && filters.selectedItems) || []).forEach(function (item) {
+      if (!item || item.series !== "country") return;
+      selected.add(item.category);
+    });
+    return selected;
+  }
+
+  function bubbleActiveState(row, filters, selectedCountries) {
+    if (selectedCountries && selectedCountries.size > 0) {
+      return selectedCountries.has(row.country) ? "selected" : "dimmed";
+    }
+    if (filters && filters.country) {
+      return filters.country === row.country ? "selected" : "dimmed";
+    }
+    return "normal";
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function pointerInContainer(event, container) {
+    var rect = container.getBoundingClientRect();
+    return {
+      x: clamp(event.clientX - rect.left, 0, rect.width),
+      y: clamp(event.clientY - rect.top, 0, rect.height),
+    };
+  }
+
+  function normalizedBrushRect(start, end) {
+    return {
+      left: Math.min(start.x, end.x),
+      top: Math.min(start.y, end.y),
+      width: Math.abs(end.x - start.x),
+      height: Math.abs(end.y - start.y),
+    };
+  }
+
+  function ensureBrushOverlay(container) {
+    if (brushOverlay && brushOverlay.parentNode === container) return brushOverlay;
+    brushOverlay = document.createElement("div");
+    brushOverlay.className = "map-brush-rect new-bubble-chart-brush";
+    brushOverlay.style.display = "none";
+    container.appendChild(brushOverlay);
+    return brushOverlay;
+  }
+
+  function updateBrushOverlay(container, start, end) {
+    var overlay = ensureBrushOverlay(container);
+    var rect = normalizedBrushRect(start, end);
+    overlay.style.display =
+      rect.width >= MIN_BRUSH_DISTANCE || rect.height >= MIN_BRUSH_DISTANCE ? "block" : "none";
+    overlay.style.left = rect.left + "px";
+    overlay.style.top = rect.top + "px";
+    overlay.style.width = rect.width + "px";
+    overlay.style.height = rect.height + "px";
+  }
+
+  function hideBrushOverlay() {
+    if (brushOverlay) {
+      brushOverlay.style.display = "none";
+    }
+  }
+
+  function rowsInsideBrush(rect) {
+    if (!mapInstance || rect.width < MIN_BRUSH_DISTANCE || rect.height < MIN_BRUSH_DISTANCE) return [];
+    return currentBubbleRows.filter(function (row) {
+      var coord = COUNTRY_CENTROIDS[row.country];
+      if (!coord) return false;
+      var point = mapInstance.latLngToContainerPoint(coord);
+      return (
+        point.x >= rect.left &&
+        point.x <= rect.left + rect.width &&
+        point.y >= rect.top &&
+        point.y <= rect.top + rect.height
+      );
+    });
+  }
+
+  function commitBrushSelection(rect) {
+    if (typeof global.updateFilters !== "function") return;
+    var selected = rowsInsideBrush(rect).map(function (row) {
+      return { category: row.country, series: "country" };
+    });
+    global.updateFilters({
+      country: null,
+      selectedItems: selected,
+      sourceChart: "newBubbleChart",
+      sourceView: "newBubbleChart",
+      action: "brushSelect",
+    });
+  }
+
+  function endBrush(event, commit) {
+    if (!brushState) return;
+    var state = brushState;
+    var rect = normalizedBrushRect(state.start, state.current);
+    brushState = null;
+    hideBrushOverlay();
+    document.removeEventListener("mousemove", handleBrushMove, true);
+    document.removeEventListener("mouseup", handleBrushEnd, true);
+    if (state.draggingEnabled && mapInstance && mapInstance.dragging) {
+      mapInstance.dragging.enable();
+    }
+    if (event) {
+      event.preventDefault();
+      if (typeof event.stopImmediatePropagation === "function") {
+        event.stopImmediatePropagation();
+      } else {
+        event.stopPropagation();
+      }
+    }
+    if (commit && state.moved && rect.width >= MIN_BRUSH_DISTANCE && rect.height >= MIN_BRUSH_DISTANCE) {
+      commitBrushSelection(rect);
+    }
+  }
+
+  function handleBrushMove(event) {
+    if (!brushState) return;
+    var container = document.getElementById(CONTAINER_ID);
+    if (!container) return;
+    brushState.current = pointerInContainer(event, container);
+    brushState.moved =
+      Math.abs(brushState.current.x - brushState.start.x) >= MIN_BRUSH_DISTANCE ||
+      Math.abs(brushState.current.y - brushState.start.y) >= MIN_BRUSH_DISTANCE;
+    updateBrushOverlay(container, brushState.start, brushState.current);
+    event.preventDefault();
+    if (typeof event.stopImmediatePropagation === "function") {
+      event.stopImmediatePropagation();
+    } else {
+      event.stopPropagation();
+    }
+  }
+
+  function handleBrushEnd(event) {
+    endBrush(event, true);
+  }
+
+  function isBrushExcludedTarget(target) {
+    if (!target || !target.closest) return false;
+    return !!target.closest(
+      ".leaflet-control, .leaflet-interactive, .leaflet-tooltip, .new-bubble-chart-leaflet-tooltip, .map-brush-rect"
+    );
+  }
+
+  function handleBrushStart(event) {
+    if (!mapInstance || !currentBubbleRows.length || event.button !== 0) return;
+    if (brushState) return;
+    if (isBrushExcludedTarget(event.target)) return;
+    var container = document.getElementById(CONTAINER_ID);
+    if (!container) return;
+    var point = pointerInContainer(event, container);
+    brushState = {
+      start: point,
+      current: point,
+      moved: false,
+      draggingEnabled: !!(mapInstance.dragging && mapInstance.dragging.enabled()),
+    };
+    if (mapInstance.dragging) {
+      mapInstance.dragging.disable();
+    }
+    hideBrushOverlay();
+    document.addEventListener("mousemove", handleBrushMove, true);
+    document.addEventListener("mouseup", handleBrushEnd, true);
+    event.preventDefault();
+    if (typeof event.stopImmediatePropagation === "function") {
+      event.stopImmediatePropagation();
+    } else {
+      event.stopPropagation();
+    }
+  }
+
+  function bindBrushEvents(container) {
+    if (brushEventsBound) return;
+    container.addEventListener("mousedown", handleBrushStart, true);
+    brushEventsBound = true;
+  }
+
   function ensureImportedBubbleMap(container) {
     if (!L) {
       container.innerHTML = '<p class="chart-empty-hint">地图加载失败，请刷新页面重试。</p>';
@@ -159,9 +344,12 @@
         attribution: "&copy; OpenStreetMap",
       }).addTo(mapInstance);
       mapLayerGroup = L.layerGroup().addTo(mapInstance);
+      ensureBrushOverlay(container);
     } else {
       mapLayerGroup.clearLayers();
+      ensureBrushOverlay(container);
     }
+    bindBrushEvents(container);
     return true;
   }
 
@@ -176,6 +364,7 @@
     var rows = aggregateImportedBubbleRows(records);
 
     if (!ensureImportedBubbleMap(container)) return;
+    currentBubbleRows = rows;
     if (!rows.length) {
       mapLayerGroup.clearLayers();
       container.classList.add("new-bubble-chart--empty");
@@ -186,19 +375,21 @@
     var maxCount = rows.reduce(function (max, row) {
       return Math.max(max, row.count);
     }, 1);
+    var selectedCountries = selectedCountrySet(currentFilters);
 
     rows.forEach(function (row) {
       var coord = COUNTRY_CENTROIDS[row.country];
       var platform = dominantPlatform(row);
       var commonRating = dominantRating(row);
-      var active = !currentFilters.country || currentFilters.country === row.country;
+      var activeState = bubbleActiveState(row, currentFilters, selectedCountries);
+      var active = activeState !== "dimmed";
       var radius = 6 + (row.count / maxCount) * 24;
       var circle = L.circleMarker(coord, {
         radius: radius,
-        color: active ? "#111827" : "#64748b",
-        weight: active ? 1.4 : 0.8,
+        color: activeState === "selected" ? "#fef3c7" : active ? "#111827" : "#64748b",
+        weight: activeState === "selected" ? 2.4 : active ? 1.4 : 0.8,
         fillColor: PLATFORM_COLORS[platform] || "#3b82f6",
-        fillOpacity: active ? 0.62 : 0.28,
+        fillOpacity: activeState === "selected" ? 0.88 : active ? 0.62 : 0.18,
       });
       circle.bindTooltip(
         '<div class="new-bubble-chart-tooltip">' +
