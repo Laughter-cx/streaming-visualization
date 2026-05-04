@@ -455,6 +455,27 @@ body {
   z-index: 500;
 }
 
+.map-brush-rect,
+.new-bubble-chart-brush {
+  position: absolute;
+  display: none;
+  z-index: 900;
+  pointer-events: none;
+  background: rgba(229, 9, 20, 0.16);
+  border: 1px solid rgba(229, 9, 20, 0.8);
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+}
+
+.chart-panel__body--new-bubble .leaflet-interactive:focus {
+  outline: none;
+}
+
+.chart-panel__body--new-bubble .leaflet-tooltip,
+.new-bubble-chart-leaflet-tooltip {
+  pointer-events: none;
+}
+
 .new-bubble-chart-leaflet-tooltip {
   background: rgba(255, 255, 255, 0.98);
   color: #1f2937;
