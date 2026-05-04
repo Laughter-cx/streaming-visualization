@@ -1,140 +1,88 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>流媒体争霸：Netflix vs Disney+ vs 其他</title>
-    <link rel="stylesheet" href="./style.css">
-</head>
-<body>
-    <div class="container">
-        <div class="sidebar">
-            <h2>筛选控件</h2>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>流媒体数据可视化</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <!-- D3 v7：后续阶段绘制图表时使用 -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <header class="page-header" id="page-header">
+          <h1 class="page-title" id="page-title">流媒体数据可视化</h1>
+          <p class="page-subtitle">探索不同平台、类型与地区的内容分布趋势</p>
+        </header>
 
-            <div class="filter-section">
-                <h3>平台筛选</h3>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="platform1">
-                        <label for="platform1">Netflix</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="platform2">
-                        <label for="platform2">Disney+</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="platform3">
-                        <label for="platform3">Amazon Prime</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="platform4">
-                        <label for="platform4">其他平台</label>
-                    </div>
-                </div>
-            </div>
+        <section class="control-panel" id="control-panel" aria-label="筛选面板">
+          <div class="year-filter-wrap">
+            <label class="slider-label" for="year-slider">
+              年份：<span class="slider-value" id="year-slider-value">2024</span>
+            </label>
+            <input
+              type="range"
+              id="year-slider"
+              class="year-slider"
+              min="2015"
+              max="2024"
+              value="2024"
+              step="1"
+            />
+          </div>
+          <div id="global-filter-panel"></div>
+        </section>
+      </aside>
 
-            <div class="filter-section">
-                <h3>年份范围</h3>
-                <div class="filter-control">
-                    <label>起始年份</label>
-                    <select>
-                        <option>2015</option>
-                        <option>2016</option>
-                        <option>2017</option>
-                        <option>2018</option>
-                        <option>2019</option>
-                        <option>2020</option>
-                        <option>2021</option>
-                        <option>2022</option>
-                        <option>2023</option>
-                        <option>2024</option>
-                    </select>
-                </div>
-                <div class="filter-control">
-                    <label>结束年份</label>
-                    <select>
-                        <option>2015</option>
-                        <option>2016</option>
-                        <option>2017</option>
-                        <option>2018</option>
-                        <option>2019</option>
-                        <option>2020</option>
-                        <option>2021</option>
-                        <option>2022</option>
-                        <option>2023</option>
-                        <option selected>2024</option>
-                    </select>
-                </div>
-            </div>
+      <main class="main-content">
+        <div class="charts-grid">
+          <section class="chart-panel" id="new-bubble-chart-panel" aria-label="平台地区气泡图">
+            <h2 class="chart-panel__title">平台内容地区分布</h2>
+            <div class="chart-panel__body chart-panel__body--new-bubble" id="new-bubble-chart-container"></div>
+          </section>
 
-            <div class="filter-section">
-                <h3>类型筛选</h3>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="type1">
-                        <label for="type1">电影</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="type2">
-                        <label for="type2">电视剧</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="type3">
-                        <label for="type3">纪录片</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="type4">
-                        <label for="type4">动画</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="type5">
-                        <label for="type5">综艺</label>
-                    </div>
-                </div>
-            </div>
+          <section class="chart-panel" id="new-radar-chart-panel" aria-label="内容类型雷达图">
+            <h2 class="chart-panel__title">平台内容类型对比</h2>
+            <div class="chart-panel__body chart-panel__body--new-radar" id="new-radar-chart-container"></div>
+          </section>
 
-            <div class="filter-section">
-                <h3>地区筛选</h3>
-                <div class="filter-control">
-                    <select>
-                        <option value="">全部地区</option>
-                        <option value="na">北美</option>
-                        <option value="eu">欧洲</option>
-                        <option value="asia">亚洲</option>
-                        <option value="other">其他</option>
-                    </select>
-                </div>
-            </div>
+          <section
+            class="chart-panel chart-panel--stacked"
+            id="stacked-bar-panel"
+            aria-label="堆叠柱状图"
+          >
+            <h2 class="chart-panel__title">热门地区电影与剧集数量前 10</h2>
+            <div class="chart-panel__body chart-panel__body--stacked" id="stacked-bar-container"></div>
+          </section>
 
-            <div class="documentation">
-                <h3>说明文档</h3>
-                <p>本平台提供流媒体平台的可视化分析功能。</p>
-                <p>通过左侧筛选控件可以选择不同的数据维度，右侧展示四种不同类型的图表。</p>
-                <p>图表包括堆叠柱状图、平行坐标图、世界地图和雷达图。</p>
-                <button class="doc-button">查看详细说明文档</button>
-            </div>
+          <section
+            class="chart-panel chart-panel--parallel"
+            id="parallel-coords-panel"
+            aria-label="平行坐标图"
+          >
+            <h2 class="chart-panel__title">内容分级、时长、年份与类型对比</h2>
+            <p class="chart-panel__desc">
+              每条线代表一部影视作品，用于比较内容分级、时长、上线年份和类型之间的关系。
+            </p>
+            <div class="chart-panel__body chart-panel__body--parallel" id="parallel-coords-container"></div>
+          </section>
         </div>
-
-        <div class="main-content">
-            <div class="charts-grid">
-                <div class="chart-container">
-                    <h3>图一：堆叠柱状图</h3>
-                    <div class="chart-placeholder">图表区域</div>
-                </div>
-                <div class="chart-container">
-                    <h3>图二：平行坐标图</h3>
-                    <div class="chart-placeholder">图表区域</div>
-                </div>
-                <div class="chart-container">
-                    <h3>图三：空白世界地图</h3>
-                    <div class="chart-placeholder">图表区域</div>
-                </div>
-                <div class="chart-container">
-                    <h3>图四：雷达图</h3>
-                    <div class="chart-placeholder">图表区域</div>
-                </div>
-            </div>
-        </div>
+      </main>
     </div>
-</body>
+
+    <!-- 顺序：状态 → 数据加载器 → 控件/图表 → 入口 -->
+    <script src="js/filters.js"></script>
+    <script src="js/dataLoader.js"></script>
+    <script src="js/tooltip.js"></script>
+    <script src="js/filterPanel.js"></script>
+    <script src="js/yearSlider.js"></script>
+    <script src="js/newBubbleChart.js"></script>
+    <script src="js/newRadarChart.js"></script>
+    <script src="js/stackedBar.js"></script>
+    <script src="js/parallelCoords.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>
