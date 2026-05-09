@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>流媒体数据可视化 - 说明文档</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <header class="page-header" id="page-header">
+          <h1 class="page-title" id="page-title">流媒体数据可视化</h1>
+          <p class="page-subtitle">探索不同平台、类型与地区的内容分布趋势</p>
+        </header>
+        <div class="filter-group streaming-filter-group streaming-filter-group--actions">
+          <button type="button" onclick="window.location.href='index.html'">返回主页</button>
+        </div>
+      </aside>
+
+      <main class="main-content doc-content">
+        <article class="doc-article">
+          <h1>流媒体争霸：Netflix vs Disney+ vs 其他 —— 交互式可视化说明文档</h1>
+
+          <h2>1. 项目概述</h2>
+
+          <h3>1.1 选题背景</h3>
+          <p>随着流媒体平台（Netflix、Disney+、Amazon Prime）的竞争日益激烈，内容库的构成、口碑表现及全球扩张策略成为了行业关注的焦点。本作品旨在通过交互式可视化手段，挖掘各大平台在海量数据背后的差异化竞争策略，帮助用户直观理解不同平台的定位与优势。</p>
+
+          <h3>1.2 核心研究问题</h3>
+          <ul>
+            <li><strong>增长态势</strong>：不同流媒体平台的内容库增长趋势有何异同？</li>
+            <li><strong>口碑对比</strong>：哪个平台的整体评分表现更优？</li>
+            <li><strong>多维关联</strong>：评分、时长、上映年份之间是否存在潜在关联？</li>
+            <li><strong>近期趋势</strong>：近五年各平台的内容扩张趋势怎样？</li>
+            <li><strong>内容偏好</strong>：各平台在内容类型（动作、喜剧、纪录片等）上的侧重点有何不同？</li>
+            <li><strong>地理分布</strong>：内容的产地分布具有怎样的空间规律？</li>
+          </ul>
+
+          <h3>1.3 最终作品链接</h3>
+          <ul>
+            <li><strong>GitHub Pages</strong>: <a href="https://Laughter-cx.github.io/streaming-visualization" target="_blank">https://Laughter-cx.github.io/streaming-visualization</a></li>
+            <li><strong>演示视频</strong>: [Bilibili 视频链接]</li>
+          </ul>
+
+          <h2>2. 数据来源与处理</h2>
+
+          <h3>2.1 原始数据</h3>
+          <ul>
+            <li><strong>Netflix 数据集</strong>: Kaggle - Netflix Movies and TV Shows (约 8,000 条)</li>
+            <li><strong>Disney+ 数据集</strong>: Kaggle - Disney+ Movies and TV Shows (约 1,500 条)</li>
+            <li><strong>Amazon Prime 数据集</strong>: Kaggle - Amazon Prime Movies and TV Shows (约 10,000 条)</li>
+          </ul>
+
+          <h3>2.2 数据清洗与整合</h3>
+          <ul>
+            <li>统一三个数据集的列名（title, platform, type, release_year, rating, duration, country, listed_in, description）</li>
+            <li>处理缺失值：缺失的国家填 Unknown，缺失的评分填 N/A，缺失的描述填 No description</li>
+            <li>提取时长中的分钟数（仅对电影有效）</li>
+            <li>合并三个数据集，输出 streaming_data.json（共 19,925 条）</li>
+            <li>计算各平台各类型占比，输出 type_ratio.json（用于雷达图）</li>
+            <li>为前端开发提供 200 条样本数据 sample.json</li>
+          </ul>
+
+          <h2>3. 设计决策与替代方案</h2>
+
+          <h3>3.1 为什么选择堆叠条形图 + 年份滑块？</h3>
+          <ul>
+            <li><strong>决策</strong>：展示各平台每年新增内容数量的变化趋势，并用滑块让用户选择时间范围。</li>
+            <li><strong>理由</strong>：堆叠条形图能直观对比多个平台在同一时间维度上的总量和构成，年份滑块提供交互式时间窗口过滤。</li>
+            <li><strong>替代方案</strong>：曾考虑过折线图（更强调趋势），但堆叠条形图在展示"每年总量+平台贡献"上更清晰，且与滑块配合更适合用户逐步探索。</li>
+          </ul>
+
+          <h3>3.2 为什么选择平行坐标图？</h3>
+          <ul>
+            <li><strong>决策</strong>：用平行坐标图展示评分、时长、上映年份、类型编码之间的多维关系，并支持 brush（框选）交互。</li>
+            <li><strong>理由</strong>：平行坐标图非常适合探索多个数值维度之间的相关性（如高评分是否与特定时长或年份相关），并支持刷选范围过滤。</li>
+            <li><strong>替代方案</strong>：散点图矩阵只能展示两两关系，无法同时处理4个以上维度；热力图无法表达个体影片的分布。</li>
+          </ul>
+
+          <h3>3.3 为什么选择世界地图 + 气泡？</h3>
+          <ul>
+            <li><strong>决策</strong>：用气泡图叠加在世界地图上，表示各国家/地区的内容数量。</li>
+            <li><strong>理由</strong>：地理分布是内容策略的重要维度，气泡大小直观反映数量差异，悬停显示详情。</li>
+            <li><strong>替代方案</strong>：choropleth（填色地图）会因国家面积大小误导用户（如俄罗斯面积大但内容可能不多），气泡图更准确。</li>
+            <li><strong>地图瓦片选择</strong>：最初使用 OpenStreetMap 瓦片服务，在国内网络下无法访问，最终替换为高德地图瓦片服务。</li>
+          </ul>
+
+          <h3>3.4 为什么选择雷达图（饼图）？</h3>
+          <ul>
+            <li><strong>决策</strong>：用雷达图（实际实现为饼图）比较不同平台在"动作/喜剧/剧情/纪录片"等类型上的占比。</li>
+            <li><strong>理由</strong>：雷达图适合展示多个类别的比例分布，易于发现平台的类型侧重。因实现复杂度，最终采用饼图，效果同样清晰。</li>
+            <li><strong>替代方案</strong>：分组柱状图也能比较，但饼图更紧凑。</li>
+          </ul>
+
+          <h3>3.5 交互技术选择</h3>
+          <ul>
+            <li><strong>决策</strong>：使用 D3.js 处理地图和平行坐标图，原生 JavaScript 管理全局状态和联动，Vega-Lite 或原生 D3 实现堆叠柱状图和饼图。</li>
+            <li><strong>理由</strong>：D3 灵活强大，可定制复杂图表；原生 JS 提供响应式数据流，简化联动逻辑。</li>
+            <li><strong>替代方案</strong>：纯 D3 实现所有图表会增加代码量和调试难度，纯 Vega-Lite 难以实现自定义地图和复杂 brush 交互。</li>
+          </ul>
+
+          <h2>4. 交互功能说明</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>视图</th>
+                <th>图表类型</th>
+                <th>交互功能</th>
+                <th>回答的问题</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>主视图1</td>
+                <td>堆叠条形图 + 年份滑块</td>
+                <td>点击柱子、拖动滑块</td>
+                <td>各平台内容库增长趋势</td>
+              </tr>
+              <tr>
+                <td>主视图2</td>
+                <td>平行坐标图</td>
+                <td>brush（框选）& 悬停显示详情</td>
+                <td>评分、时长、年份之间的多维关系</td>
+              </tr>
+              <tr>
+                <td>主视图3</td>
+                <td>世界地图（气泡叠加）</td>
+                <td>点击气泡、悬停显示详情</td>
+                <td>各平台内容的地域分布差异</td>
+              </tr>
+              <tr>
+                <td>辅助视图</td>
+                <td>饼图（原设计为雷达图）</td>
+                <td>点击平台扇形</td>
+                <td>比较不同平台在各类内容上的占比</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>5. 开发流程与成员分工</h2>
+
+          <h3>5.1 迭代历程</h3>
+          <ol>
+            <li><strong>v1.0 (第1周)</strong>：完成数据清洗，搭建 D3.js 基础框架，初步实现堆叠柱状图。</li>
+            <li><strong>v2.0 (第2周)</strong>：引入全局状态管理，实现多图双向联动；优化地图渲染逻辑，引入气泡层。</li>
+            <li><strong>v3.0 (第3周)</strong>：完成 UI 视觉微调，修复地图瓦片加载与工具提示 Bug，录制演示视频。</li>
+          </ol>
+
+          <h3>5.2 成员分工与工时统计</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>成员</th>
+                <th>主要职责</th>
+                <th>详细贡献</th>
+                <th>投入工时</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>崔晨曦(组长)</strong></td>
+                <td>项目协调与集成</td>
+                <td>数据清洗、全局架构设计、文档定稿、测试与部署。</td>
+                <td>约 22h</td>
+              </tr>
+              <tr>
+                <td><strong>黄奕晨</strong></td>
+                <td>核心视图开发</td>
+                <td>堆叠条形图、平行坐标图开发，实现 Brush 联动及性能优化。</td>
+                <td>约 28h</td>
+              </tr>
+              <tr>
+                <td><strong>李雪丽</strong></td>
+                <td>地图与 UI 细节</td>
+                <td>世界地图（气泡映射）、饼图开发，修复提示框及地图联动 Bug。</td>
+                <td>约 26h</td>
+              </tr>
+              <tr>
+                <td><strong>胡贸曦</strong></td>
+                <td>视觉设计与演示</td>
+                <td>HTML/CSS 布局美化、响应式适配、90秒演示视频剪辑。</td>
+                <td>约 18h</td>
+              </tr>
+            </tbody>
+          </table>
+          <p><strong>总计工时</strong>：约 94 小时</p>
+
+          <h3>5.3 三次迭代记录</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>迭代版本</th>
+                <th>时间</th>
+                <th>新增/改进内容</th>
+                <th>负责人</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>v1.0（基础版）</td>
+                <td>第1周</td>
+                <td>数据清洗完成；堆叠柱状图和平行坐标图框架搭建；地图使用 OpenStreetMap（底图无法加载）；无联动功能</td>
+                <td>全员</td>
+              </tr>
+              <tr>
+                <td>v2.0（加入联动）</td>
+                <td>第2周初</td>
+                <td>实现 updateAllCharts 全局联动框架；柱状图、饼图、地图之间的点击联动；平行坐标图 brush 功能完成</td>
+                <td>B</td>
+              </tr>
+              <tr>
+                <td>v3.0（修复地图）</td>
+                <td>第2周末</td>
+                <td>地图底图从 OpenStreetMap 替换为高德地图瓦片服务；修复地图底图超时问题；完善工具提示样式</td>
+                <td>C</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>5.4 组长测试日志（迭代验证）</h3>
+
+          <h4>V1.0</h4>
+          <p><strong>5月4日</strong></p>
+          <p><strong>测试内容</strong>：数据加载、页面显示</p>
+          <p><strong>发现问题</strong>：地图底图超时；平行坐标图无 brush；无联动</p>
+          <p><strong>状态</strong>：未通过</p>
+          <p><strong>反馈对象</strong>：黄奕晨 李雪丽</p>
+
+          <h4>V2.0</h4>
+          <p><strong>5月6日</strong></p>
+          <p><strong>测试内容</strong>：联动功能、brush</p>
+          <p><strong>发现问题</strong>：brush 可框选且联动正常；地图底图仍超时</p>
+          <p><strong>状态</strong>：部分通过</p>
+          <p><strong>反馈对象</strong>：李雪丽（需换瓦片）</p>
+
+          <h4>V3.0</h4>
+          <p><strong>5月8日</strong></p>
+          <p><strong>测试内容</strong>：地图底图修复、全部功能回归测试</p>
+          <p><strong>发现问题</strong>：地图底图正常（高德瓦片 200）；Console 无红色错误；所有联动正常；响应式布局正常</p>
+          <p><strong>状态</strong>：全部通过</p>
+          <p><strong>反馈对象</strong>：无</p>
+
+          <h3>最终测试确认项</h3>
+          <ul>
+            <li>数据加载成功（19,925 条）</li>
+            <li>堆叠柱状图显示正常，年份滑块可拖动</li>
+            <li>平行坐标图 brush 出现矩形框，松开后其他图表联动</li>
+            <li>地图底图显示街道/国家边界（高德瓦片）</li>
+            <li>地图气泡点击联动正常</li>
+            <li>地图悬停工具提示正常</li>
+            <li>饼图点击联动正常</li>
+            <li>柱状图点击联动正常</li>
+            <li>响应式布局（窗口拖窄无重叠，可滑动）</li>
+            <li>Console 无红色错误，Network 无 4xx/5xx</li>
+          </ul>
+
+          <h2>6. 外部资源引用</h2>
+          <ul>
+            <li><strong>可视化库</strong>：D3.js (v7), Leaflet.js (地图底图)</li>
+            <li><strong>前端框架</strong>：Tailwind CSS (样式管理)</li>
+            <li><strong>数据来源</strong>：Kaggle Open Datasets</li>
+            <li><strong>字体/图标</strong>：Font Awesome，字体使用系统默认，无外部字体引用</li>
+            <li><strong>世界地图底图</strong>：<a href="https://lbs.amap.com/" target="_blank">https://lbs.amap.com/</a></li>
+          </ul>
+
+          <p class="doc-footer">本报告由团队成员协作完成，旨在展示流媒体数据可视化的完整生命周期。</p>
+        </article>
+      </main>
+    </div>
+  </body>
+</html>

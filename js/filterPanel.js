@@ -25,6 +25,9 @@
       '<div class="filter-group streaming-filter-group streaming-filter-group--actions">' +
       '<button type="button" id="filter-reset-btn">重置筛选</button>' +
       "</div>" +
+      '<div class="filter-group streaming-filter-group streaming-filter-group--actions">' +
+      '<button type="button" id="view-doc-btn">查看文档</button>' +
+      "</div>" +
       "</section>";
   }
 
@@ -78,6 +81,13 @@
     resetBtn.addEventListener("click", function () {
       resetGlobalFilters();
     });
+
+    var viewDocBtn = container.querySelector("#view-doc-btn");
+    if (viewDocBtn) {
+      viewDocBtn.addEventListener("click", function () {
+        window.open("doc.html", "_blank");
+      });
+    }
   }
 
   function resetGlobalFilters() {

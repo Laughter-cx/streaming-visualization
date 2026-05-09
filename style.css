@@ -618,6 +618,112 @@ body {
   background: #252a36;
 }
 
+/* 文档页面样式 */
+.doc-content {
+  padding: 30px;
+}
+
+.doc-article {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.doc-article h1 {
+  margin: 0 0 1.5rem;
+  padding-bottom: 1rem;
+  color: #ffffff;
+  font-size: 1.75rem;
+  font-weight: 700;
+  border-bottom: 2px solid #e50914;
+}
+
+.doc-article h2 {
+  margin: 2rem 0 1rem;
+  color: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.doc-article h3 {
+  margin: 1.5rem 0 0.75rem;
+  color: #d5d8e2;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.doc-article h4 {
+  margin: 1rem 0 0.5rem;
+  color: #d5d8e2;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.doc-article p {
+  margin: 0.75rem 0;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.doc-article ul,
+.doc-article ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.doc-article li {
+  margin-bottom: 0.5rem;
+}
+
+.doc-article a {
+  color: #e50914;
+  text-decoration: none;
+}
+
+.doc-article a:hover {
+  text-decoration: underline;
+}
+
+.doc-article table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.doc-article th,
+.doc-article td {
+  padding: 10px 12px;
+  text-align: left;
+  border: 1px solid #303545;
+}
+
+.doc-article th {
+  color: #ffffff;
+  font-weight: 600;
+  background: #252a36;
+}
+
+.doc-article td {
+  color: #9ca3af;
+}
+
+.doc-article tr:nth-child(even) {
+  background: rgba(37, 42, 54, 0.5);
+}
+
+.doc-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #303545;
+  color: #6b7280 !important;
+  font-size: 0.85rem !important;
+  text-align: center;
+}
+
 @media (max-width: 980px) {
   body {
     overflow: auto;
