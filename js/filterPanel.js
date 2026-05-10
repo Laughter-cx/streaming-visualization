@@ -85,7 +85,7 @@
     var viewDocBtn = container.querySelector("#view-doc-btn");
     if (viewDocBtn) {
       viewDocBtn.addEventListener("click", function () {
-        window.open("doc.html", "_blank");
+        window.location.href = "doc.html";
       });
     }
   }

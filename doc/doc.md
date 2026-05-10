@@ -18,7 +18,7 @@
 ### **1.3 最终作品链接**
 
 * **GitHub Pages**: [https://Laughter-cx.github.io/streaming-visualization](https://Laughter-cx.github.io/streaming-visualization)  
-* **演示视频**: \[Bilibili 视频链接\]
+* **演示视频**: [https://www.bilibili.com/video/BV1fc5j62E7a/?share_source=copy_web&vd_source=009ab5836cedd7bf287723ef64a8cc78](https://www.bilibili.com/video/BV1fc5j62E7a/?share_source=copy_web&vd_source=009ab5836cedd7bf287723ef64a8cc78)
 
 ## **2\. 数据来源与处理**
 
